@@ -1,4 +1,4 @@
-export const SYS_MAIL = (otp) => {
+export const SYS_MAIL_OTP = (otp) => {
   return `
       <div style="font-family: Arial; text-align: center; padding: 20px;">
         <h2 style="color:#333;">Email Verification</h2>

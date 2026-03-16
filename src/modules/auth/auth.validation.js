@@ -27,3 +27,11 @@ export const signinSchema = joi
     "any.required": "Login payload is required",
     "object.unknown": "Invalid login payload",
   });
+
+  export const otpSchema = joi.object({
+    email: generalFields.email,
+    otp: generalFields.otp
+  }).required().messages({
+       "any.required": "otp payload is required",
+    "object.unknown": "Invalid otp payload",
+  })

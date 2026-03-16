@@ -43,18 +43,23 @@ const schema = new Schema(
         return true;
       },
     },
-    otp: {
-      type: String,
-      required: false,
-    },
-    otpExpireAt: {
-      type: Date,
-      required: false,
-    },
+
+    // otp: { related to otp old layer
+    //   type: String,
+    //   required: false,
+    // },
+    // otpExpireAt: {
+    //   type: Date,
+    //   required: false,
+    // },
     isVerified: {
       type: Boolean,
       default: false,
     },
+    credentialsUpdatedAt: {
+      type: Date,
+      default: Date.now()
+    }
   },
 
   {

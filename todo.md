@@ -20,4 +20,4 @@
  -authentications  [login-successfully] >> with valid token
  -authorization > access APIs >>Check user - admin
  -validation (Joi - Zod) *layer*
- file upload [upload-pictures (profile)] [multer]
+ -file upload [upload-pictures (profile)] [multer] (handle rollback)

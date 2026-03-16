@@ -2,6 +2,8 @@ import { BadRequestException, SYS_GENDER, SYS_ROLE } from "../common/index.js";
 import joi from "joi"
 export const isValid = (schema) => {
   return (req, res, next) => {
+ 
+
     const validationResult = schema.validate(req.body, {
       abortEarly: false, //bad as a performance but good for UX
     });
@@ -66,5 +68,11 @@ export const generalFields = {
           .messages({
             "string.pattern.base":
               "phone number must be in the format 00201012345678 or 01012345678 or +201012345678",
-          })
+          }),
+            otp: joi.string().required().min(2).max(20).trim().messages({
+          "string.base": "otp must be a string",
+          "string.empty": "otp is required",
+          "string.min": "otp must be at least 2 characters long",
+          "string.max": "otp must be at most 20 characters long",
+        })
 }

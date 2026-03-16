@@ -1,1 +1,1 @@
-export * from "./models/user/user.repository.js";
+export * from "./models/index.js"
