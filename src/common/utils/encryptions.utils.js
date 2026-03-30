@@ -27,3 +27,4 @@ export const decryption = (encryptedData) => {
   decryptedValue += decipher.final("utf-8");
   return decryptedValue;
 };
+

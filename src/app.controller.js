@@ -1,19 +1,46 @@
 import express from "express";
 import { connectDB } from "./DB/connection.js";
-import { authRouter, userRouter } from "./modules/index.js";
+import { authRouter, messageRouter, userRouter } from "./modules/index.js";
 import appConfig from "../config/config.service.js";
-
+import cors from "cors";
+import { redisConnect } from "./DB/redis.connection.js";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import { BadRequestException } from "./common/index.js";
 const bootstrap = async () => {
   const app = express();
   const port = appConfig.port;
   connectDB();
+  //security middleware helmet
+  app.use(helmet());
+  //rate limit
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 1000,
+      handler: (req, res, next) => {
+        throw new BadRequestException(
+          "Too many requests, please try again later",
+          429,
+        );
+      },
+      legacyHeaders: false,
+      keyGenerator: (req, res) => {
+        return `${req.ip}:${req.url}`;
+      },
+    }),
+  );
+
+  await redisConnect();
+  //cors setup and add url in env config
+  app.use(cors());
   //parsing data from request body (raw)
   app.use(express.json());
   //access to files & folders
   app.use("/uploads", express.static("uploads"));
   app.use("/auth", authRouter);
   app.use("/user", userRouter);
-
+  app.use("/message", messageRouter);
   //global error handler
   app.use((error, req, res, next) => {
     //this is to control jwt default messages

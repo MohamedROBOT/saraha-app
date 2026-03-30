@@ -15,17 +15,17 @@ export const fileUpload = (allowedType = ["image/jpeg", "image/png"]) => {
     limits:{fileSize: 50000000000},
     storage: diskStorage({
       //result from execution of [diskStorage, memoryStorage]
-      //create folder
+      
       destination: (req, file, cb) => {
+        //create folder
         //string => path to save file or function
-        //contain user data from previous middleware
-        if (!fs.existsSync(`uploads/${req.user._id}`))
-          fs.mkdirSync(`uploads/${req.user._id}`);
-        cb(null, `uploads/${req.user._id}`);
+        const folder = req.user? `uploads/${req.user._id}` : `uploads/${req.params.receiverId}/messages`;
+        if (!fs.existsSync(folder))
+          fs.mkdirSync(folder, {recursive: true});
+        cb(null, folder);
       },
       filename: (req, file, cb) => {
         //function
-        console.log({ file });
         cb(null, Math.random() + Date.now() + "__" + file.originalname); //create unique name
       },
     }),

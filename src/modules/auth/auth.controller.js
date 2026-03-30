@@ -1,19 +1,22 @@
 import { Router } from "express";
-import { checkUserExist, updateUser } from "../user/user.service.js";
+import { SYS_MESSAGE, fileUpload } from "../../common/index.js";
 import {
-  BadRequestException,
-  ConflictException,
-  SYS_MESSAGE,
-  decryption,
-  generateToken,
-  fileUpload,
-  verifyToken,
-} from "../../common/index.js";
-import jwt from "jsonwebtoken";
-import appConfig from "../../../config/config.service.js";
-import { otpSchema, signinSchema, signupSchema } from "./auth.validation.js";
+  otpSchema,
+  signinSchema,
+  signinWithGoogleSchema,
+  signupSchema,
+} from "./auth.validation.js";
 import { isValid } from "../../middlewares/validation.middleware.js";
-import { login, logout, logoutFromAllDevices, refreshToken, sendOTP, signup, verifyAccount } from "./auth.service.js";
+import {
+  login,
+  loginWithGoogle,
+  logout,
+  logoutFromAllDevices,
+  refreshToken,
+  sendOTP,
+  signup,
+  verifyAccount,
+} from "./auth.service.js";
 import { isAuthenticated } from "../../middlewares/authentication.middleware.js";
 
 const router = Router();
@@ -56,17 +59,17 @@ router.patch("/verify-account", isValid(otpSchema), async (req, res, next) => {
 });
 
 router.post("/send-otp", async (req, res, next) => {
-  //check user exist and status before send it (BUG from instructor) 
+  //check user exist and status before send it (BUG from instructor)
   //add it to service not here!
   await sendOTP(req);
   return res.status(200).json({
     message: "OTP sent successfully",
     success: true,
   });
-})
+});
 
 router.get("/refresh-token", async (req, res, next) => {
-const tokens = await refreshToken(req)
+  const tokens = await refreshToken(req);
   return res.status(200).json({
     message: "refresh token successfully",
     success: true,
@@ -74,20 +77,40 @@ const tokens = await refreshToken(req)
   });
 });
 
-router.patch("/logout-from-all-devices",isAuthenticated ,async(req, res, next) => {
- await logoutFromAllDevices(req.user)
-return res.status(200).json({
-  message: "logout from all devices successfully",
-  success: true
-})
+router.patch(
+  "/logout-from-all-devices",
+  isAuthenticated,
+  async (req, res, next) => {
+    await logoutFromAllDevices(req.user);
+    return res.status(200).json({
+      message: "logout from all devices successfully",
+      success: true,
+    });
+  },
+);
+
+router.post("/logout", isAuthenticated, async (req, res, next) => {
+  await logout(req.payload);
+  return res.status(200).json({
+    message: "logout successfully",
+    success: true,
+  });
 });
 
-router.post("/logout",isAuthenticated ,async(req, res, next) => {
- await logout(req.payload)
-return res.status(200).json({
-  message: "logout successfully",
-  success: true
-})
-});
-
+router.post(
+  "/login-with-google",
+  isValid(signinWithGoogleSchema),
+  async (req, res, next) => {
+    const { idToken } = req.body;
+    const { accessToken, refreshToken } = await loginWithGoogle(idToken);
+    return res.status(200).json({
+      success: true,
+      message: "login with google successfully",
+      token: {
+        accessToken,
+        refreshToken,
+      },
+    });
+  },
+);
 export default router;

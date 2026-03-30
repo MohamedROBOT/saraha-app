@@ -5,7 +5,8 @@ import {
   SYS_MESSAGE,
   verifyToken,
 } from "../common/index.js";
-import { tokenRepository, userRepository } from "../DB/index.js";
+import { userRepository } from "../DB/index.js";
+import { redisClient } from "../DB/redis.connection.js";
 
 export const isAuthenticated = async (req, res, next) => {
   //get token from request
@@ -19,7 +20,8 @@ export const isAuthenticated = async (req, res, next) => {
   if (new Date(user.credentialsUpdatedAt).getTime() > payload.iat * 1000) {
     throw new BadRequestException("invalid token, please login again");
   }
-  const tokenExist = await tokenRepository.getOne({ token: payload.jti });
+  //check revoked tokens
+  const tokenExist = await redisClient.get(`bl${payload.jti}`);
   if (tokenExist) throw new BadRequestException("invalid token, please login again");
   req.user = user;
   req.payload = payload;

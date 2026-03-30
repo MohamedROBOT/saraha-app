@@ -74,5 +74,9 @@ export const generalFields = {
           "string.empty": "otp is required",
           "string.min": "otp must be at least 2 characters long",
           "string.max": "otp must be at most 20 characters long",
-        })
+        }),
+        idToken: joi.string().required().messages({
+          "string.base": "idToken must be a string",
+          "string.empty": "idToken is required",
+        }),
 }

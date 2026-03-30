@@ -1,5 +1,4 @@
 import joi from "joi";
-import { SYS_GENDER, SYS_ROLE } from "../../common/index.js";
 import { generalFields } from "../../middlewares/validation.middleware.js";
 export const signupSchema = joi
   .object({
@@ -34,4 +33,12 @@ export const signinSchema = joi
   }).required().messages({
        "any.required": "otp payload is required",
     "object.unknown": "Invalid otp payload",
+  })
+
+
+  export const signinWithGoogleSchema = joi.object({
+    idToken: generalFields.idToken
+  }).required().messages({
+       "any.required": "idToken payload is required",
+    "object.unknown": "Invalid idToken payload",
   })

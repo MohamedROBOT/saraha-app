@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { SYS_GENDER, SYS_ROLE } from "../../../common/index.js";
+import { SYS_GENDER, SYS_PROVIDER, SYS_ROLE } from "../../../common/index.js";
 const schema = new Schema(
   {
     userName: {
@@ -16,9 +16,17 @@ const schema = new Schema(
       trim: true,
       lowercase: true,
     },
+    provider: {
+      type: String,
+      enum: Object.values(SYS_PROVIDER),
+      default: SYS_PROVIDER.system,
+    },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        if (this.provider !== SYS_PROVIDER.system) return false;
+        return true;
+      },
     },
     gender: {
       type: Number,
@@ -54,12 +62,12 @@ const schema = new Schema(
     // },
     isVerified: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     credentialsUpdatedAt: {
       type: Date,
-      default: Date.now()
-    }
+      default: Date.now(),
+    },
   },
 
   {
